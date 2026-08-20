@@ -1,0 +1,12 @@
+# build artifacts
+c/c-linux
+baseline/baseline
+
+# dataset (too big for git)
+measurements*.txt
+*.txt.gz
+
+# tooling
+.vscode/
+.idea/
+.worktrees/

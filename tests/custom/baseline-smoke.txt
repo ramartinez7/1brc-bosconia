@@ -1,0 +1,7 @@
+Zürich;1.0
+Abéché;-1.0
+Zürich;2.0
+TieEven;0.0
+TieEven;0.1
+TieOdd;0.1
+TieOdd;0.2

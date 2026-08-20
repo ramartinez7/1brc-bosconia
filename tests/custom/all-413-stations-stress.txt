@@ -1,0 +1,413 @@
+BoundaryThirtyTwoBytesName0000XX;2.9
+BoundaryThirtyTwoBytesName0001XX;16.9
+BoundaryThirtyTwoBytesName0002XX;-36.4
+BoundaryThirtyTwoBytesName0003XX;-39.0
+BoundaryThirtyTwoBytesName0004XX;30.2
+BoundaryThirtyTwoBytesName0005XX;14.4
+BoundaryThirtyTwoBytesName0006XX;-13.2
+BoundaryThirtyTwoBytesName0007XX;36.7
+BoundaryThirtyTwoBytesName0008XX;-8.8
+BoundaryThirtyTwoBytesName0009XX;33.8
+BoundaryThirtyTwoBytesName0010XX;30.3
+BoundaryThirtyTwoBytesName0011XX;42.0
+BoundaryThirtyTwoBytesName0012XX;34.7
+BoundaryThirtyTwoBytesName0013XX;30.5
+BoundaryThirtyTwoBytesName0014XX;9.5
+BoundaryThirtyTwoBytesName0015XX;45.6
+BoundaryThirtyTwoBytesName0016XX;13.5
+BoundaryThirtyTwoBytesName0017XX;29.8
+BoundaryThirtyTwoBytesName0018XX;-26.0
+BoundaryThirtyTwoBytesName0019XX;-24.6
+BoundaryThirtyTwoBytesName0020XX;46.7
+BoundaryThirtyTwoBytesName0021XX;-18.1
+BoundaryThirtyTwoBytesName0022XX;25.1
+BoundaryThirtyTwoBytesName0023XX;47.5
+BoundaryThirtyTwoBytesName0024XX;1.8
+BoundaryThirtyTwoBytesName0025XX;15.9
+BoundaryThirtyTwoBytesName0026XX;-4.1
+BoundaryThirtyTwoBytesName0027XX;-3.0
+BoundaryThirtyTwoBytesName0028XX;31.0
+BoundaryThirtyTwoBytesName0029XX;-9.6
+SharedPrefixStressTestNameBase!A;-15.9
+SharedPrefixStressTestNameBase!Aext;36.0
+SharedPrefixStressTestNameBase!B;1.5
+SharedPrefixStressTestNameBase!Bext;-38.5
+SharedPrefixStressTestNameBase!C;10.9
+SharedPrefixStressTestNameBase!Cext;-27.0
+SharedPrefixStressTestNameBase!D;-1.6
+SharedPrefixStressTestNameBase!Dext;-1.4
+SharedPrefixStressTestNameBase!E;30.0
+SharedPrefixStressTestNameBase!Eext;-1.6
+SharedPrefixStressTestNameBase!F;35.3
+SharedPrefixStressTestNameBase!Fext;31.7
+SharedPrefixStressTestNameBase!G;48.6
+SharedPrefixStressTestNameBase!Gext;-17.8
+SharedPrefixStressTestNameBase!H;-11.8
+SharedPrefixStressTestNameBase!Hext;32.4
+SharedPrefixStressTestNameBase!I;2.9
+SharedPrefixStressTestNameBase!Iext;32.3
+SharedPrefixStressTestNameBase!J;-24.9
+SharedPrefixStressTestNameBase!Jext;-35.5
+ThirtyThreeBytesLongNameHere0000Z;-8.5
+ThirtyThreeBytesLongNameHere0001Z;-23.5
+ThirtyThreeBytesLongNameHere0002Z;20.4
+ThirtyThreeBytesLongNameHere0003Z;47.3
+ThirtyThreeBytesLongNameHere0004Z;-14.8
+ThirtyThreeBytesLongNameHere0005Z;46.9
+ThirtyThreeBytesLongNameHere0006Z;27.8
+ThirtyThreeBytesLongNameHere0007Z;-30.2
+ThirtyThreeBytesLongNameHere0008Z;-31.4
+ThirtyThreeBytesLongNameHere0009Z;5.2
+ThirtyThreeBytesLongNameHere0010Z;22.8
+ThirtyThreeBytesLongNameHere0011Z;-18.1
+ThirtyThreeBytesLongNameHere0012Z;-35.4
+ThirtyThreeBytesLongNameHere0013Z;-33.6
+ThirtyThreeBytesLongNameHere0014Z;-19.5
+ThirtyThreeBytesLongNameHere0015Z;-27.3
+ThirtyThreeBytesLongNameHere0016Z;14.4
+ThirtyThreeBytesLongNameHere0017Z;10.6
+ThirtyThreeBytesLongNameHere0018Z;-1.4
+ThirtyThreeBytesLongNameHere0019Z;-10.3
+MidRangeNameoHBvRPOIvGrviFlbCBFNOg;22.8
+MidRangeNamemBjMtpsiaOclRzAwzKsbVRJ;32.9
+MidRangeNameNwVGFYGWWmQzCudiHYFjSonX;18.7
+MidRangeNamekMtECqOxSFOGYRdoXKXWNqRsr;16.0
+MidRangeNamepEmoKiuPKdYRosjOrUxxDO CzU;31.6
+MidRangeNameZRENktUNpfZpdJQIPvjiQvlblZX;-3.0
+MidRangeNameOIgfFwDHJoKyrbmEYYmdhQjAruHr;-24.1
+MidRangeNameiwRxpVHSbKdAuuQgwLgGoT;18.4
+MidRangeNameogmMJXwKixhAmUfBHXzTPDP;-25.5
+MidRangeNamekFFuf EwixIIqejKQhmbNiwu;43.7
+MidRangeNamesMtTZqpXchcHPOEVBljOlOAEt;15.5
+MidRangeNameoDOECVEgPRqfNiIukkePyezaMG;26.8
+MidRangeNameGqbWbaduDrppGDZuVzGPMMicIbL;-37.7
+MidRangeNameRdPEczjGDpiAFwPKafeNZDKYAYQy;5.0
+MidRangeNameydSbsuyjqtfJMSNDlviDvU;2.0
+MidRangeNameDDleghKDgFLEmErPZHkPlmC;-20.3
+MidRangeNamenFaqlkhUQNqtUPQZIqpTdUwE;18.7
+MidRangeNameAdnkGEiNgQIWEPXSKcitTnzph;13.0
+MidRangeNameAq jTqGIQHGvjJRSmNtVNroQgf;14.8
+MidRangeNameQDFobRCAVxIoQKvcjtbjAHEsJiC;-1.4
+LongerCityName00XljJbICTXyCWNrPqGWxjanvJP;34.6
+LongerCityName01KzzLaBLvVyazqvzPRKysGYCeOM;-5.1
+LongerCityName02 dWT yOOBqMZVRExRWpgZriVBHQ;21.5
+LongerCityName03LlQCGmbWuyUbmgHYkMQCtbAhziru;46.8
+LongerCityName04vvqMXbEqVnUqHuTgTqaUZsSjIMaqY;42.4
+LongerCityName05rvLnkTZjATSNbylmpUdccrNgeyyvKq;27.8
+LongerCityName06FSgqonVF wPrTOzMJBCPenxEdaokMts;-33.0
+LongerCityName07YfZPJpsAwxGxbOLzshdDjPHdIzdqhjmU;35.0
+LongerCityName08wcn ugbjcKvecQwPoRxxhfoPRcEtSPRVU;36.9
+LongerCityName09iFIJOYsJtNEaaVidaDNaYxlsBwkYeAWTwY;21.8
+LongerCityName10aivvizmOfORbfBYVqrzZuKdIniBZlkqBFpb;34.3
+LongerCityName11IdLDQYUNdUVwYRwaQFeBviDWOpExpCwBPMBn;29.4
+LongerCityName12JPIeqHkNdsQxXKmmvtHx KTGlBTkrYZtMElso;-17.7
+LongerCityName13PGsxTrmzHykyCWibqXEgpVAa fGbXodtJbLuhp;40.4
+LongerCityName14Rnzixedb ulRUPFRcPwdknqYVBfULfNWzQVRmsR;22.7
+LongerCityName15jAhMFPuafjwPseptfcyBFSOZsPTqlXejhWbvjVWs;37.5
+LongerCityName16dRTQOHuMUHviwsLMNveRulwhmSGMSOXLTAtiIRCDj;37.0
+LongerCityName17SsIowfGAkSeecVLDQeH EZfEkorDJJzkTFPHjwammy;-21.1
+LongerCityName18nOxhYccTlbTknDnvGwNoNQqFKPLjEKAacsmeSCOStSs;7.8
+LongerCityName19dErOQyyolqzMbHiOpJR JEDKyTmv kScHdsTsZRgifcF;25.7
+LongerCityName20mCbvUmQBFOrklBwr RkCwwLehpcRLlbo fFeWaVUqGKVa;39.8
+LongerCityName21sfSqZ wjCdFUQUHxZg AqidaDMhXnwfocwDNRjIScsfHBo;-27.4
+LongerCityName22mzPtKTjAjaFOHdHpJftSgtRaeePdjJYMmgvIERxyaVygR A;-9.9
+LongerCityName23SuTllqfJcieWVjwiYdUMsPkYO;-26.7
+LongerCityName24xaCUvetzYYqy pJfCIglVGcGhd;-16.0
+LongerCityName25AuJapJEeyQVnsZpFVriYUotwfiC;-20.8
+LongerCityName26nEPorSOvFbGwotGcKsTBCUyDSWXb;23.2
+LongerCityName27JPhakryLKLFnYnrPflJOdoQdQqAzd;48.0
+LongerCityName28SriKEcWlTobsQdTMYeGPYkWkSsSBqZ;-16.4
+LongerCityName29RAkrxvDmvfSxzOmzWOoMnQrwuxqrIoG;38.0
+SixtyFourBytesExactLengthStationNameForAVX2BoundaryTest0000QQQQQ;-23.8
+SixtyFourBytesExactLengthStationNameForAVX2BoundaryTest0001QQQQQ;45.3
+SixtyFourBytesExactLengthStationNameForAVX2BoundaryTest0002QQQQQ;-3.9
+SixtyFourBytesExactLengthStationNameForAVX2BoundaryTest0003QQQQQ;-20.1
+SixtyFourBytesExactLengthStationNameForAVX2BoundaryTest0004QQQQQ;-36.8
+SixtyFourBytesExactLengthStationNameForAVX2BoundaryTest0005QQQQQ;35.8
+SixtyFourBytesExactLengthStationNameForAVX2BoundaryTest0006QQQQQ;-3.3
+SixtyFourBytesExactLengthStationNameForAVX2BoundaryTest0007QQQQQ;19.7
+SixtyFourBytesExactLengthStationNameForAVX2BoundaryTest0008QQQQQ;43.5
+SixtyFourBytesExactLengthStationNameForAVX2BoundaryTest0009QQQQQ;-8.7
+SixtyFourBytesExactLengthStationNameForAVX2BoundaryTest0010QQQQQ;12.6
+SixtyFourBytesExactLengthStationNameForAVX2BoundaryTest0011QQQQQ;-21.0
+SixtyFourBytesExactLengthStationNameForAVX2BoundaryTest0012QQQQQ;-21.5
+SixtyFourBytesExactLengthStationNameForAVX2BoundaryTest0013QQQQQ;-30.6
+SixtyFourBytesExactLengthStationNameForAVX2BoundaryTest0014QQQQQ;18.9
+SixtyFourBytesExactLengthStationNameForAVX2BoundaryTest0015QQQQQ;37.5
+SixtyFourBytesExactLengthStationNameForAVX2BoundaryTest0016QQQQQ;16.7
+SixtyFourBytesExactLengthStationNameForAVX2BoundaryTest0017QQQQQ;-38.6
+SixtyFourBytesExactLengthStationNameForAVX2BoundaryTest0018QQQQQ;46.2
+SixtyFourBytesExactLengthStationNameForAVX2BoundaryTest0019QQQQQ;47.2
+VeryLongCityDistrict00opCTycClXuIFSUvaLMIyiXhgRKQ ezSvVzHdEJwOrur;6.6
+VeryLongCityDistrict01ZzjXFyZAQiHdXrvrQlY oXGrOeBnjUnOpEo dsTpaHIC;-30.1
+VeryLongCityDistrict02CTfHGPiIYdXqvsialvuJapGfnaRCsXNccPXGrXipWDZRM;8.4
+VeryLongCityDistrict03H dFqNpomBDyVPIykNEwjNlN OVxJymARJIiQzLHqBIAWy;-35.1
+VeryLongCityDistrict04yPlUBLQDIvahHvEecxXglGcgOnCuyqhTdpBDeZbrGftcEFU;-37.0
+VeryLongCityDistrict05mJEIRnoljtUYmhSdgmbGysHppxjuNbcOaV dZauGUbUqQXJr;-31.2
+VeryLongCityDistrict06eEFFFbGvvXzIjDljjVqHaWqwbuDSmTWGkgNJqeOGWjXHwRkOz;5.6
+VeryLongCityDistrict07bjx nnrpjBmqsRBLRswTVWALJkqZEJvoBFvhNYadVKXTuUxkmF;-16.1
+VeryLongCityDistrict08DJKwnDrFRcqbfmcaRNwgHWbHSrrlfhqTCOZmDANTNxIwQSUHAfv;-18.3
+VeryLongCityDistrict09bLIYitOgjqzWEZvCbBdEUkbkZtoaSHZBUKzndsXFbGPblZhFZTvV;-7.0
+VeryLongCityDistrict10OVxKEgoHhgMxWWu p JPGJQMLmJwwpELxofdwkwlcrkponUoUJcEe;18.8
+VeryLongCityDistrict11coTyRlDWgETdcCDXSEpFnmgYdljyvCczkpMUmegJDcGzVtFgpLCPtc;-28.7
+VeryLongCityDistrict12chhnKXXSYaxVrmDyopVEVGjrYSQuqmJVFlqJWTpsqZImtFTjYpyV Iq;30.4
+VeryLongCityDistrict13svrhFpqbgXBXTLNVxfMOIJESyGgxivhCqVxnImYJKLsxnzKucCaXruPc;-18.2
+VeryLongCityDistrict14nSwvycOiPTzyeMXrkcdxSxYghaK MzmIQDpeXjGthHSFwKRcgJbFO cWB;7.7
+VeryLongCityDistrict15aDZgXPYFXOBUGtpVyJICSesIwtecnAFBQNJjumhbHxS;21.4
+VeryLongCityDistrict16PTHDPaoyndEHfmiBogkPtJSbAnWPkaLqqFhXEhigygjB;0.4
+VeryLongCityDistrict17YeCoYXQvBWyEWPuqoGxlvwVICWiV pLxrdseoLzIEtxdC;-32.4
+VeryLongCityDistrict18SMCyMCUTgZ ieQCwpMSWxDpVRHzXbZvcYVLfsfXzhRzFub;7.1
+VeryLongCityDistrict19Fbm LiSUGFUqSTcmtbKscWcCuWnbRoyDEqoZXgzvrKBJmry;-26.7
+VeryLongCityDistrict20cCIEPxpXXYkCmJrcXXcwEkIhXZUpRPHBvLfhYjHQxQtcNnSs;37.7
+VeryLongCityDistrict21fMHIEcLtcFzrUqWtEjiSTKttsoLyXgOHMyIPyfBXjkXdzjInF;-39.1
+VeryLongCityDistrict22ETZtuehaxa kEIUpEcdrhWIxjolLxIbgDHhJTKKUtOWhSFQMoj;-14.5
+VeryLongCityDistrict23RIoTniFgpKllJKqnumVkC BFCpxkQpNxkanoBfoiSpTePzzrZTd;40.4
+VeryLongCityDistrict24EsDKcaedNVmJUtUuWZIwXgjGUPdHRcPJGDSYnaPK UkuUMwKfgdf;-5.0
+ExtremelyLongMunicipalAdministrative00TfBFZgdPNlWDDSfmpreSiAGbIQuXwZXCZDkjMXjSEY;-36.6
+ExtremelyLongMunicipalAdministrative01gcwjR nrnHIGZXyVjXwJMmgZgCCCItVzehdJmgIUnUK;-27.9
+ExtremelyLongMunicipalAdministrative02ZnvTlVggiftkTe BXVrHalTyusoBmeQpyxlkOuDleKho;-34.6
+ExtremelyLongMunicipalAdministrative03unxYJ rPCksHMBcUaJasNagxnevuDtIhNjUqehYULdiVi;-16.9
+ExtremelyLongMunicipalAdministrative04WrxurpzsQneMPRjTOTxStNstfUeWjyuRSHkriYZ WxzJSC;-19.2
+ExtremelyLongMunicipalAdministrative05StFWcpQveNM iRjsRIGnvlPPDqhOoODGaVteGrxIAjKapee;-1.0
+ExtremelyLongMunicipalAdministrative06pMwSUSpDxFpkOivuCLaLCZyfLvSCATkmGVSdpihfIgdRMzHV;14.3
+ExtremelyLongMunicipalAdministrative07KudpQtLAvVySkrwMLnoZ bgUFZqGLIeUPAQYPcwRVTlukAQpX;-27.5
+ExtremelyLongMunicipalAdministrative08sPDqHdTKZrgtxTsHoSXnOOIeJdvmXasjewizq NwPrwmyFhcht;-39.2
+ExtremelyLongMunicipalAdministrative09XEkHDjgMkiJKUhcHrNtlfFgczDdIgadkDjdrzTuBZQ AvNlECbW;-30.3
+ExtremelyLongMunicipalAdministrative10sEiDEeCSaLxIxpupaXYcYYFrqiIpWHLiZhIuOAwBTdruibiY OPd;-9.8
+ExtremelyLongMunicipalAdministrative11WJRMuwHCzqanxBPNEGmCcmrtDPvCZcOiNwxDIgSO ukUkmxr UPTJ;-36.7
+ExtremelyLongMunicipalAdministrative12qhOaTRDjlvLorbjfDWpqYyhUsaaJTYLwiePOTtJzdDjaajhIYPQNVp;-10.8
+ExtremelyLongMunicipalAdministrative13FcXFiuMDRYrmmCEMzwluqjNeNVTANMvHvwePsmtNZPjUxSYdipWTQXg;38.9
+ExtremelyLongMunicipalAdministrative14fdGzuewUNXUaCkOvJBQjlluaSJMVOYkPfjprVQw fupvfdKuyWKIuifL;44.8
+ExtremelyLongMunicipalAdministrative15ipDhCE qDwAaIoOEtJANgdXDnoqneqfBAijaABhuRiSBg srbzLGGhJPM;12.2
+ExtremelyLongMunicipalAdministrative16nhQ WRyZFXZdkPsOTr FppwCFZYYjeDoAsKFfbpyVkGhCONskeRCErRikq;-1.9
+ExtremelyLongMunicipalAdministrative17CLUBNlJw t ZETKkPkYriVYwvIysuFgvWDGbOEVmxnmZxUBoRycfOWjYbLr;21.9
+ExtremelyLongMunicipalAdministrative18lqYFxnSzPtEFRJYtyoJvYUXGFATcXwRGIFLbcjjgaGBFWjFmmyUYASaYxFuj;-26.3
+ExtremelyLongMunicipalAdministrative19PkhKrYKIRTRfJEKbRaTeyEXQPuofmnMdGITAZVnYzVcVb  pmITUmsMeULZUS;15.5
+ExtremelyLongMunicipalAdministrative20vsofkyPUYR yZXHkMliLrxjBudtNczSsE yyarfIoT;3.1
+ExtremelyLongMunicipalAdministrative21PQqJtbyYEcmelZigsaiCyXszimoFGxPqqWKpnCkprpZ;7.9
+ExtremelyLongMunicipalAdministrative22wVybGAGQOgvhjlskOcXZdxrlsgJWBeGSaFHuJWTVdyNh;-32.1
+ExtremelyLongMunicipalAdministrative23eWeGcuscUETCztHBVpGrzKvPhLjKVjbdOzZoLLoqbZBvn;30.0
+ExtremelyLongMunicipalAdministrative24MclbYAtNNRwtzyEkGziLXUMdHQqfhoUmYnZlHWWdnL rtz;-15.6
+MaximumHundredBytesSpecificationLimitStationNameForFull1BRCTest0000EndPadMMMMMMMMMMMMMMMMMMMMMMMMMMM;-10.3
+MaximumHundredBytesSpecificationLimitStationNameForFull1BRCTest0001EndPadMMMMMMMMMMMMMMMMMMMMMMMMMMM;-31.0
+MaximumHundredBytesSpecificationLimitStationNameForFull1BRCTest0002EndPadMMMMMMMMMMMMMMMMMMMMMMMMMMM;-21.7
+MaximumHundredBytesSpecificationLimitStationNameForFull1BRCTest0003EndPadMMMMMMMMMMMMMMMMMMMMMMMMMMM;-23.8
+MaximumHundredBytesSpecificationLimitStationNameForFull1BRCTest0004EndPadMMMMMMMMMMMMMMMMMMMMMMMMMMM;4.9
+MaximumHundredBytesSpecificationLimitStationNameForFull1BRCTest0005EndPadMMMMMMMMMMMMMMMMMMMMMMMMMMM;47.5
+MaximumHundredBytesSpecificationLimitStationNameForFull1BRCTest0006EndPadMMMMMMMMMMMMMMMMMMMMMMMMMMM;-25.8
+MaximumHundredBytesSpecificationLimitStationNameForFull1BRCTest0007EndPadMMMMMMMMMMMMMMMMMMMMMMMMMMM;34.4
+MaximumHundredBytesSpecificationLimitStationNameForFull1BRCTest0008EndPadMMMMMMMMMMMMMMMMMMMMMMMMMMM;9.1
+MaximumHundredBytesSpecificationLimitStationNameForFull1BRCTest0009EndPadMMMMMMMMMMMMMMMMMMMMMMMMMMM;-28.4
+MaximumHundredBytesSpecificationLimitStationNameForFull1BRCTest0010EndPadMMMMMMMMMMMMMMMMMMMMMMMMMMM;10.0
+MaximumHundredBytesSpecificationLimitStationNameForFull1BRCTest0011EndPadMMMMMMMMMMMMMMMMMMMMMMMMMMM;42.0
+MaximumHundredBytesSpecificationLimitStationNameForFull1BRCTest0012EndPadMMMMMMMMMMMMMMMMMMMMMMMMMMM;-23.4
+MaximumHundredBytesSpecificationLimitStationNameForFull1BRCTest0013EndPadMMMMMMMMMMMMMMMMMMMMMMMMMMM;37.6
+MaximumHundredBytesSpecificationLimitStationNameForFull1BRCTest0014EndPadMMMMMMMMMMMMMMMMMMMMMMMMMMM;22.1
+Oslo;49.4
+Lima;-33.9
+Kyoto;38.2
+Cairo;0.9
+Dhaka;48.6
+Seoul;10.8
+Lagos;-31.9
+Accra;37.5
+Dakar;-29.8
+Kabul;45.7
+Hanoi;-33.7
+Riyadh;20.3
+Tehran;20.6
+Athens;-23.4
+Warsaw;-1.7
+Prague;46.6
+Vienna;16.6
+Dublin;-12.6
+Lisbon;16.1
+Madrid;-9.6
+Ankara;32.5
+Nairobi;32.4
+Abidjan;11.4
+Kampala;-24.0
+Harare;-10.5
+Lusaka;25.4
+Maputo;47.4
+Asmara;-2.2
+Conakry;-25.0
+Monrovia;16.9
+Freetown;-14.9
+Yamoussoukro;35.2
+Ouagadougou;45.5
+Niamey;31.3
+Bamako;-33.0
+Ndjamena;25.1
+Bangui;-38.6
+Brazzaville;20.0
+Kinshasa;-21.4
+Luanda;-2.1
+Windhoek;45.7
+Gaborone;-26.3
+Maseru;43.1
+Mbabane;25.5
+Antananarivo;29.1
+Port Louis;-11.0
+Victoria;44.1
+Moroni;-15.7
+São Tomé;44.6
+Malabo;-10.3
+Libreville;14.3
+Yaoundé;21.4
+Lomé;-33.3
+Cotonou;-5.2
+Porto-Novo;-27.0
+Parakou;7.4
+Zinder;43.6
+Maradi;-33.1
+Agadez;31.0
+Tahoua;-0.6
+Kano;19.9
+Ibadan;22.2
+Enugu;26.2
+Benin City;35.2
+Warri;-9.8
+Port Harcourt;-28.8
+Calabar;-25.0
+Jos;-26.0
+Abuja;-15.4
+Kaduna;-23.3
+Katsina;5.8
+Sokoto;-36.4
+Maiduguri;22.9
+Yola;26.4
+Makurdi;-26.7
+Abeokuta;-25.4
+Ilorin;-26.7
+Oshogbo;-31.2
+Ife;9.2
+Ondo;25.2
+Akure;2.3
+Uyo;30.3
+Umuahia;-2.3
+Awka;-12.6
+Onitsha;40.9
+Asaba;-14.1
+Sapele;46.3
+Ughelli;-17.1
+Agbor;7.6
+Kwale;-33.1
+Ozoro;33.3
+Aba;46.3
+Owerri;-29.7
+Ikot;-14.9
+Ogoja;3.5
+Gboko;6.7
+Otukpo;-30.0
+Lafia;20.4
+Nasarawa;-2.4
+Keffi;14.9
+Akwanga;-12.4
+Wamba;-34.4
+Shendam;16.9
+Pankshin;16.5
+Langtang;28.9
+Biu;4.8
+Damboa;-30.3
+Dikwa;35.0
+Monguno;-4.2
+ànlFrIUHPTHL;-40.0
+sJgYamIkYbLfoi;40.1
+jKfSILUc;26.7
+WAfI;4.8
+YjgpfarfX;37.8
+tácfKFkBywOSCROi;-40.0
+KxdkvxxfjgHk;20.4
+Rxi Xi;44.0
+wuci;48.1
+bGvpwPTCc;29.2
+Wí FcíHxzPN;-13.7
+ítnobKnIyN NzD;9.3
+iRmiKUùtSSkRìé;-7.6
+úr GIòwyaàDRípIsíIP;37.8
+tUPwrZf;-3.8
+koRoaYc;-18.1
+oyxFZ;20.8
+vRsèóXdìfUlAíxéuFuù;-10.2
+oqsWéEyiZNòb NfRU;3.4
+VjkIkéfyVúrw;39.6
+CGoy;-14.4
+BHèéKcdAòbMsàIópT;-17.4
+RFpXQFXq;-24.0
+DZoTuswO;44.6
+pFtGANeEIlOhrcAA;49.3
+HíbsIeEOYFuzX;49.3
+GUXTIY;-32.4
+prJEhkA;-8.3
+cWuNovJa;14.7
+íNFúGIwHluYWòbUyI;28.5
+RpFPjmmumS;19.8
+qTN;-32.7
+mgMvZSpDyúyòPfYHPfo;6.0
+hAXUI;-24.2
+íákaXirLweòxEBl;-37.6
+AQNCD;-23.6
+gSotgxabsZFoiin;24.7
+RFTFgNz;41.6
+iUZlowp;-10.4
+TsbuP;-16.4
+PFbH;-12.0
+nmDTqvqvLHAtIsAKf;-10.4
+hhy uQKXIvxíRu;41.0
+xBVzbR;-2.1
+EQtùkoEfdgXDfékKXKQ;46.7
+kruHOv;-19.0
+ACéíAPCeXYàJLèòéCjz;0.5
+OUPaàuUR EkXHgrú;-22.0
+LOzh;-27.7
+ZEdS;-12.6
+UFjdAXMSkyTv;-24.9
+dXlfxxMuiw;-8.4
+JAaBOiWosA;43.1
+AwqYévuTGNhùP;17.7
+fòDùJtRFCàOúéhas;-11.3
+dùvFlGgIo ZElk;37.9
+bqIP;-34.8
+QéUèzZsávUUc;19.1
+OEìMIxxlGJG;-15.1
+cdUaHiWx;-21.4
+cTdQHFKzr;30.3
+tsmCNáéUJFtX;41.3
+WZgDrTQ LB;2.6
+écjvjPGdGzyIHAD;9.3
+IM ZXropFl;-14.2
+à EBEMúpczI;35.5
+zVHCd;-21.3
+KkbX;42.2
+fBYrbLWNàLRRcóJ;-6.9
+nnnP;37.5
+faójeDFRYIaM;30.0
+PoziyBYytWeiyfWàkgU;27.3
+RLBUmOBúzxRDzeh;-5.0
+xlOùKGPqPRi yà;13.5
+wOkz;-24.1
+WèáéLLPlUzvsWàl;-9.3
+tsW;-22.9
+kMzfiTL;-2.8
+CFDOmOBheAVànMzIVt;24.1
+zUDBJltJ;-6.4
+hXEXtq;22.6
+lGVTUIùKuìbyoòf;-17.1
+LtòjsóènyWOql;27.3
+YTusSILu;18.8
+skZ;10.6
+LmUz;-6.6
+okGfJVvEPW;-37.8
+KoóòF tqouóVc;25.0
+QNP;30.8
+WQyGu;24.6
+DYc;-6.9
+ùKóafóYWiYGáeyík;25.1
+KcEzCSBUQG;-34.9
+VKYKu;1.3
+jFVmn;28.6
+tBbìpKmóbKDGVNùMas;-28.8
+uèuiQqSTPGDZkjáfJDXA;30.0
+FS qomeMGBNKoSùF;16.1
+éHTyZefúqQFpiYLXóY;27.4
