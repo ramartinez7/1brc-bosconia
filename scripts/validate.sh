@@ -93,7 +93,7 @@ SANITIZER_FLAGS=(
     -march=native -mavx2 -mbmi2 -std=c11
     -Wall -Wextra -Wpedantic -Werror
     -pthread
-    -fsanitize=address,undefined
+    "-fsanitize=address,undefined"
 )
 if "${CC:-cc}" "${SANITIZER_FLAGS[@]}" \
         tests/c-dense-regression.c \
@@ -114,5 +114,7 @@ else
     echo "FAIL"
     exit 1
 fi
+
+python3 tests/general-input-test.py c
 
 echo "validation: PASS"

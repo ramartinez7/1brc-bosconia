@@ -6,8 +6,8 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 DATA="${1:-measurements_1B.txt}"
-RUNS="${RUNS:-15}"
-WARMUP="${WARMUP:-3}"
+RUNS="${RUNS:-20}"
+WARMUP="${WARMUP:-5}"
 
 command -v hyperfine >/dev/null || {
     echo "FAIL: hyperfine is not installed." >&2
@@ -21,6 +21,7 @@ command -v fincore >/dev/null || {
 ./scripts/validate.sh "$DATA"
 dd if="$DATA" of=/dev/null bs=8M status=progress
 fincore -o RES,PAGES,SIZE "$DATA"
+grep '^FileHugePages:' /proc/meminfo
 
 hyperfine \
     --style basic \

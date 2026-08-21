@@ -22,6 +22,7 @@
 #define STATION_COUNT 413u
 #define DISPATCH_SIZE 65536u
 #define DISPATCH_MASK (DISPATCH_SIZE - 1u)
+#define OUTPUT_BYTES_PER_STATION 120u
 
 #define LIKELY(x)   __builtin_expect(!!(x), 1)
 #define UNLIKELY(x) __builtin_expect(!!(x), 0)
@@ -80,7 +81,10 @@ typedef struct {
     off_t              file_size;
     _Atomic long long *cursor;
     int                thread_idx;
-    PerHot            *hot;       // worker fills these in before returning
+    union {
+        PerHot   *hot;
+        DenseStat *stats;
+    };
 } WorkerArgs;
 
 typedef struct {
@@ -95,14 +99,6 @@ typedef struct {
     int64_t        val;
     const uint8_t *next;
 } DenseParsed;
-
-typedef struct {
-    const uint8_t          *data;
-    off_t                   file_size;
-    _Atomic long long      *cursor;
-    int                     thread_idx;
-    DenseStat              *stats;
-} DenseWorkerArgs;
 
 _Static_assert(sizeof(PerHot)   == 64,  "PerHot must stay one cache line");
 _Static_assert(sizeof(NameEntry) == 104, "NameEntry layout changed");
@@ -196,31 +192,6 @@ static ALWAYS_INLINE void parse_temp_dot(const uint8_t *ptr, int64_t *val, size_
                     & 0x0F000F0F00ULL;
     int64_t mag = (int64_t)(((digits * 0x640a0001ULL) >> 32) & 0x3FFu);
     *val = (mag ^ sign) - sign;
-}
-
-static ALWAYS_INLINE uint64_t load_u64_bounded(
-    const uint8_t *ptr,
-    const uint8_t *end)
-{
-    if ((size_t)(end - ptr) >= sizeof(uint64_t)) return load_u64(ptr);
-    uint64_t value = 0;
-    memcpy(&value, ptr, (size_t)(end - ptr));
-    return value;
-}
-
-static ALWAYS_INLINE void parse_temp_dot_bounded(
-    const uint8_t *ptr,
-    const uint8_t *end,
-    int64_t *value,
-    size_t *advance)
-{
-    if ((size_t)(end - ptr) >= sizeof(uint64_t)) {
-        parse_temp_dot(ptr, value, advance);
-        return;
-    }
-    uint8_t tail[8] = {0};
-    memcpy(tail, ptr, (size_t)(end - ptr));
-    parse_temp_dot(tail, value, advance);
 }
 
 COLD_FN static size_t parse_line_long_semi(const uint8_t *line) {
@@ -359,25 +330,27 @@ static void drain(const uint8_t *ptr, const uint8_t *safe_end, const uint8_t *en
         probe_and_update(hot, p.key, p.val, line, p.chunk0);
     }
     while (ptr < end) {
-        const uint8_t *line = ptr;
+        size_t available = (size_t)(end - ptr);
+        uint8_t line[MAX_LINE] = {0};
+        memcpy(line, ptr, available);
         size_t semi_off = 0;
-        while (line + semi_off < end && line[semi_off] != ';') semi_off++;
+        while (semi_off < available && line[semi_off] != ';') semi_off++;
         const uint8_t *val_ptr = line + semi_off + 1;
-        if (val_ptr >= end) break;
+        if (semi_off + 1 >= available) break;
 
         int64_t val; size_t adv;
-        parse_temp_dot_bounded(val_ptr, end, &val, &adv);
-        ptr = val_ptr + adv;
-        uint32_t key = make_key(load_u64_bounded(line, end), semi_off);
-
-        // Name matching reads fixed 32-byte chunks through offset 64.
-        // Bounce the bounded tail record so every such load remains valid.
-        uint8_t padded[MAX_LINE] = {0};
-        memcpy(padded, line, (size_t)(end - line));
-        __m256i chunk0 =
-            _mm256_loadu_si256((const __m256i *)padded);
-        probe_and_update(hot, key, val, padded, chunk0);
+        parse_temp_dot(val_ptr, &val, &adv);
+        ptr += semi_off + 1 + adv;
+        uint32_t key = make_key(load_u64(line), semi_off);
+        __m256i chunk0 = _mm256_loadu_si256((const __m256i *)line);
+        probe_and_update(hot, key, val, line, chunk0);
     }
+}
+
+static ALWAYS_INLINE const uint8_t *split_half(const uint8_t *data, const uint8_t *end) {
+    const uint8_t *middle = data + (size_t)(end - data) / 2u;
+    while (middle < end && *middle != '\n') middle++;
+    return middle < end ? middle + 1 : middle;
 }
 
 HOT_FN
@@ -387,15 +360,9 @@ static void process_avx2(const uint8_t *restrict data, size_t len, PerHot *restr
     __m256i semi_vec = _mm256_set1_epi8(';');
     const uint8_t *end = data + len;
 
-    // Split the segment in half and parse both halves in lockstep — two
-    // independent dep chains expose ILP for the probe/prefetch latency.
-    size_t q = len / 2u;
-    const uint8_t *e0 = data + q;
-    while (e0 < end && *e0 != '\n') e0++;
-    if (e0 < end) e0++;
-
     const uint8_t *p0 = data;
-    const uint8_t *p1 = e0;
+    const uint8_t *p1 = split_half(data, end);
+    const uint8_t *e0 = p1;
     const uint8_t *e1 = end;
     const uint8_t *sf0 = (size_t)(e0 - p0) > MAX_LINE ? e0 - MAX_LINE : p0;
     const uint8_t *sf1 = (size_t)(e1 - p1) > MAX_LINE ? e1 - MAX_LINE : p1;
@@ -411,9 +378,8 @@ static void process_avx2(const uint8_t *restrict data, size_t len, PerHot *restr
                 probe_and_update(hot, parsed1.key, parsed1.val, lp1, parsed1.chunk0);
                 break;
             }
-            // opt-rust-data-prefetch: the two interleaved lane streams
-            // under-run the HW stream prefetcher; SW-prefetch one cacheline
-            // ahead of each lane to hide the demand-load latency.
+            // The interleaved lane streams can outrun the hardware
+            // prefetcher; prefetch one cache line ahead of each lane.
             __builtin_prefetch(p0 + 128, 0, 3);
             __builtin_prefetch(p1 + 128, 0, 3);
             ParsedLine n0 = parse_line(p0, semi_vec);
@@ -458,19 +424,26 @@ static ALWAYS_INLINE DenseParsed parse_line_dense(
     return parsed;
 }
 
+// Every private slot starts sentinel-initialized: count 0 still marks an
+// untouched slot for the merge, and the reversed min/max extremes let the
+// first observed value win both comparisons without an empty-slot test.
+static void dense_stats_init(DenseStat *restrict stats) {
+    for (size_t i = 0; i < DISPATCH_SIZE; i++) {
+        stats[i] = (DenseStat){
+            .count = 0,
+            .min = INT16_MAX,
+            .max = INT16_MIN,
+            .sum = 0,
+        };
+    }
+}
+
 static ALWAYS_INLINE void dense_update_direct(
     DenseStat *restrict stats,
     uint32_t key,
     int64_t value)
 {
     DenseStat *entry = &stats[(size_t)key & DISPATCH_MASK];
-    if (UNLIKELY(entry->count == 0)) {
-        entry->count = 1;
-        entry->sum = value;
-        entry->min = (int16_t)value;
-        entry->max = (int16_t)value;
-        return;
-    }
     int16_t value16 = (int16_t)value;
     if (value16 < entry->min) entry->min = value16;
     if (value16 > entry->max) entry->max = value16;
@@ -491,22 +464,24 @@ static void dense_drain(
         dense_update_direct(stats, parsed.key, parsed.val);
     }
     while (ptr < end) {
-        const uint8_t *line = ptr;
+        size_t available = (size_t)(end - ptr);
+        uint8_t line[MAX_LINE] = {0};
+        memcpy(line, ptr, available);
         size_t semicolon_offset = 0;
-        while (line + semicolon_offset < end &&
+        while (semicolon_offset < available &&
                line[semicolon_offset] != ';')
         {
             semicolon_offset++;
         }
         const uint8_t *value_ptr = line + semicolon_offset + 1u;
-        if (value_ptr >= end) break;
+        if (semicolon_offset + 1u >= available) break;
         int64_t value;
         size_t advance;
-        parse_temp_dot_bounded(value_ptr, end, &value, &advance);
-        ptr = value_ptr + advance;
+        parse_temp_dot(value_ptr, &value, &advance);
+        ptr += semicolon_offset + 1u + advance;
         dense_update_direct(
             stats,
-            make_key(load_u64_bounded(line, end), semicolon_offset),
+            make_key(load_u64(line), semicolon_offset),
             value);
     }
 }
@@ -519,9 +494,7 @@ static void process_dense(
     if (length == 0) return;
     __m256i semi_vec = _mm256_set1_epi8(';');
     const uint8_t *end = data + length;
-    const uint8_t *end0 = data + length / 2u;
-    while (end0 < end && *end0 != '\n') end0++;
-    if (end0 < end) end0++;
+    const uint8_t *end0 = split_half(data, end);
 
     const uint8_t *ptr0 = data;
     const uint8_t *ptr1 = end0;
@@ -574,18 +547,19 @@ static inline off_t snap_to_line(off_t off, const uint8_t *data, off_t file_size
     return off;
 }
 
-static void *dense_worker_main(void *arg_ptr) {
-    DenseWorkerArgs *arg = (DenseWorkerArgs *)arg_ptr;
-    cpu_set_t set;
-    CPU_ZERO(&set);
-    CPU_SET((unsigned)arg->thread_idx, &set);
+static ALWAYS_INLINE void pin_thread(int thread_idx) {
+    cpu_set_t set; CPU_ZERO(&set); CPU_SET((unsigned)thread_idx, &set);
     (void)sched_setaffinity(0, sizeof set, &set);
+}
+
+static void *dense_worker_main(void *arg_ptr) {
+    WorkerArgs *arg = (WorkerArgs *)arg_ptr;
+    pin_thread(arg->thread_idx);
 
     size_t stats_bytes = sizeof(DenseStat) * DISPATCH_SIZE;
-    size_t allocation_bytes = (stats_bytes + 63u) & ~63u;
-    DenseStat *stats = aligned_alloc(64, allocation_bytes);
+    DenseStat *stats = aligned_alloc(64, stats_bytes);
     if (!stats) die("aligned_alloc dense stats");
-    memset(stats, 0, stats_bytes);
+    dense_stats_init(stats);
 
     const uint8_t *data = arg->data;
     off_t file_size = arg->file_size;
@@ -615,11 +589,7 @@ static void *dense_worker_main(void *arg_ptr) {
 
 static void *worker_main(void *arg_ptr) {
     WorkerArgs *arg = (WorkerArgs *)arg_ptr;
-
-    // Pin to one core; ignore failure (Hyper-V hosts may restrict affinity).
-    cpu_set_t set;
-    CPU_ZERO(&set); CPU_SET((unsigned)arg->thread_idx, &set);
-    (void)sched_setaffinity(0, sizeof set, &set);
+    pin_thread(arg->thread_idx);
 
     PerHot *hot = aligned_alloc(64, HOT_BYTES + NAMES_BYTES);
     if (!hot) die("aligned_alloc worker tables");
@@ -701,15 +671,20 @@ static int32_t avg_x10(int64_t sum, uint32_t count) {
     return (int32_t)llround(x);
 }
 
-static int compare_dense_names(const void *lhs, const void *rhs, void *ctx) {
-    const DenseDictionary *dictionary = (const DenseDictionary *)ctx;
-    const NameEntry *a = &dictionary->names[*(const size_t *)lhs];
-    const NameEntry *b = &dictionary->names[*(const size_t *)rhs];
-    size_t shorter = a->name_len < b->name_len ? a->name_len : b->name_len;
-    int comparison = memcmp(a->name, b->name, shorter);
-    return comparison != 0
-        ? comparison
-        : (int)a->name_len - (int)b->name_len;
+static ALWAYS_INLINE char *push_stats(char *p, const NameEntry *name,
+        int32_t min, int64_t sum, uint32_t count, int32_t max) {
+    memcpy(p, name->name, name->name_len); p += name->name_len; *p++ = '=';
+    p = push_temp(p, min); *p++ = '/';
+    p = push_temp(p, avg_x10(sum, count)); *p++ = '/';
+    return push_temp(p, max);
+}
+
+static char *allocate_output(size_t station_count) {
+    if (station_count > (SIZE_MAX - 3u) / OUTPUT_BYTES_PER_STATION)
+        die("output size overflow");
+    char *out = malloc(3u + station_count * OUTPUT_BYTES_PER_STATION);
+    if (!out) die("malloc output");
+    return out;
 }
 
 static char *calculate_dense(
@@ -720,7 +695,7 @@ static char *calculate_dense(
 {
     _Atomic long long cursor = 0;
     pthread_t *threads = malloc(sizeof(pthread_t) * (size_t)nthreads);
-    DenseWorkerArgs *args = calloc((size_t)nthreads, sizeof *args);
+    WorkerArgs *args = calloc((size_t)nthreads, sizeof *args);
     if (!threads || !args) die("alloc dense threads");
     for (int i = 0; i < nthreads; i++) {
         args[i].data = data;
@@ -758,11 +733,10 @@ static char *calculate_dense(
         slots,
         STATION_COUNT,
         sizeof *slots,
-        compare_dense_names,
-        (void *)dictionary);
+        compare_names,
+        (void *)dictionary->names);
 
-    char *out = malloc(64 * 1024);
-    if (!out) die("malloc dense output");
+    char *out = allocate_output(STATION_COUNT);
     char *p = out;
     *p++ = '{';
     for (size_t position = 0; position < STATION_COUNT; position++) {
@@ -770,14 +744,7 @@ static char *calculate_dense(
         if (position > 0) { *p++ = ','; *p++ = ' '; }
         const NameEntry *name = &dictionary->names[id];
         const DenseStat *stat = &merged[id];
-        memcpy(p, name->name, name->name_len);
-        p += name->name_len;
-        *p++ = '=';
-        p = push_temp(p, stat->min);
-        *p++ = '/';
-        p = push_temp(p, avg_x10(stat->sum, stat->count));
-        *p++ = '/';
-        p = push_temp(p, stat->max);
+        p = push_stats(p, name, stat->min, stat->sum, stat->count, stat->max);
     }
     *p++ = '}';
     *p = 0;
@@ -800,11 +767,15 @@ static char *calculate(const char *path) {
     close(fd);
     (void)madvise(data, (size_t)file_size, MADV_WILLNEED);
 
-    DenseDictionary *dictionary = calloc(1, sizeof *dictionary);
-    if (!dictionary) die("calloc dense dictionary");
-    if (build_dense_dictionary(data, (size_t)file_size, dictionary))
-        return calculate_dense(data, file_size, nthreads, dictionary);
-    free(dictionary);
+    const char *general_env = getenv("ONEBRC_GENERAL");
+    int general = general_env && strcmp(general_env, "1") == 0;
+    if (!general) {
+        DenseDictionary *dictionary = calloc(1, sizeof *dictionary);
+        if (!dictionary) die("calloc dense dictionary");
+        if (build_dense_dictionary(data, (size_t)file_size, dictionary))
+            return calculate_dense(data, file_size, nthreads, dictionary);
+        free(dictionary);
+    }
 
     _Atomic long long cursor = 0;
     pthread_t *threads = malloc(sizeof(pthread_t) * (size_t)nthreads);
@@ -830,9 +801,7 @@ static char *calculate(const char *path) {
         if (merged_hot[i].key != 0) slots[slot_count++] = i;
     qsort_r(slots, slot_count, sizeof(size_t), compare_names, merged_names);
 
-    // 413 stations × ~140 bytes max per row + braces/commas → ≤ 60 KiB.
-    char *out = malloc(64 * 1024);
-    if (!out) die("malloc out");
+    char *out = allocate_output(slot_count);
     char *p = out;
     *p++ = '{';
     for (size_t pos = 0; pos < slot_count; pos++) {
@@ -840,13 +809,7 @@ static char *calculate(const char *path) {
         if (pos > 0) { *p++ = ','; *p++ = ' '; }
         const HotEntry  *h = &merged_hot[idx];
         const NameEntry *n = &merged_names[idx];
-        memcpy(p, n->name, n->name_len); p += n->name_len;
-        *p++ = '=';
-        p = push_temp(p, h->min);
-        *p++ = '/';
-        p = push_temp(p, avg_x10(h->sum, h->count));
-        *p++ = '/';
-        p = push_temp(p, h->max);
+        p = push_stats(p, n, h->min, h->sum, h->count, h->max);
     }
     *p++ = '}'; *p = 0;
     // No frees: main calls _exit(0); kernel reclaims everything.

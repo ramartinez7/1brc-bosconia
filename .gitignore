@@ -10,3 +10,4 @@ measurements*.txt
 .vscode/
 .idea/
 .worktrees/
+.test-work/

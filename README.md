@@ -17,27 +17,25 @@ oracle in [`baseline/main.c`](baseline/main.c).
 
 ### Ryzen 7 1700
 
-Measured 2026-08-20 on an 8-core / 16-thread AMD Ryzen 7 1700 with 32 GiB
+Measured 2026-08-21 on an 8-core / 16-thread AMD Ryzen 7 1700 with 32 GiB
 DDR4-2667, Ubuntu 26.04, kernel 7.0.0-15, and gcc 15.2.0.
 
 | Mean elapsed | Std. dev. | Fastest | Mean CPU time |
 |---:|---:|---:|---:|
-| **674.5 ms** | 13.1 ms | 652.9 ms | 10,350 ms |
+| **635.7 ms** | 6.5 ms | 628.8 ms | 9,918 ms |
 
-The table summarizes 20 executions. No execution was flagged for benchmark
-interference.
+The table summarizes 20 executions after five warmups.
 
 ### Azure Standard_F16as_v6
 
-Measured 2026-08-20 on an AMD EPYC 9V74 VM with 16 physical Zen 4 cores,
+Measured 2026-08-21 on an AMD EPYC 9V74 VM with 16 physical Zen 4 cores,
 62 GiB RAM, Ubuntu 24.04, Azure kernel 6.17, and gcc 13.3.0.
 
 | Mean elapsed | Std. dev. | Fastest | Mean CPU time |
 |---:|---:|---:|---:|
-| **263.5 ms** | 0.7 ms | 262.2 ms | 4,089 ms |
+| **265.5 ms** | 0.4 ms | 264.9 ms | 4,118 ms |
 
-The table summarizes 20 executions. No execution was flagged for benchmark
-interference.
+The table summarizes 20 executions after five warmups.
 
 Each table describes its own host and independently generated input file.
 Full methodology and hashes are in
@@ -48,6 +46,7 @@ Full methodology and hashes are in
 ```mermaid
 flowchart TB
     F["mmap the input file"]
+    G{"ONEBRC_GENERAL=1?"}
     D["discover 413 exact runtime names"]
     U{"unique low-16 hash indices?"}
     dense["dense workers<br/>2 MiB segments + direct stats"]
@@ -55,7 +54,9 @@ flowchart TB
     M["merge + sort + format"]
     O["puts + fflush + _exit(0)"]
 
-    F --> D --> U
+    F --> G
+    G -->|yes| generic
+    G -->|no| D --> U
     U -->|yes| dense
     U -->|no| generic
     dense --> M
@@ -65,8 +66,9 @@ flowchart TB
 
 The canonical generator uses a fixed set of 413 names. At startup, the
 program discovers those names from the input and verifies that their hash
-values have unique low 16 bits. When that check passes, each worker directly
-updates a 65,536-entry table of compact statistics:
+values have unique low 16 bits. When that check passes, each worker initializes
+a 65,536-entry table with minimum/maximum sentinels and directly updates
+compact statistics:
 
 ```text
 index = hash(name) & 65535
@@ -78,9 +80,9 @@ indices are visited during the final merge. Station names are not embedded in
 the binary.
 
 If a custom input ends before 413 names are found, or two names share a
-low-16 index, the program uses its exact generic hash-table path. Inputs with
-more than 413 distinct names are outside this challenge-specific optimized
-contract.
+low-16 index, the program uses its exact generic hash-table path. Set
+`ONEBRC_GENERAL=1` to force that path for inputs with up to 16,384 distinct
+names. See [`docs/general-input.md`](docs/general-input.md).
 
 The hot parser uses AVX2 to find `;`, branchless fixed-point temperature
 parsing, two independent parsing lanes, bucket prefetching, 2 MiB
@@ -117,7 +119,7 @@ they do not appear in the repository browser.
 
 Validation compares the optimized output byte-for-byte with the oracle. It
 also runs dense-mode, collision-fallback, exhaustive-temperature, sanitizer,
-long-name, and page-aligned EOF regressions.
+long-name, page-aligned EOF, and general-input/cardinality regressions.
 
 ## Generate the official dataset
 
@@ -161,6 +163,7 @@ tests/                dense, fallback, parser, sanitizer, and EOF regressions
 docs/
   algorithm.md        implementation walkthrough
   bench-artifacts.md  benchmark methodology and measurements
+  general-input.md    exact supported input and cardinality modes
 ```
 
 ## License

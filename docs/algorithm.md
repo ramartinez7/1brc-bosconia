@@ -25,7 +25,7 @@ cache. Page residency and large-file folio state are separate conditions; see
 ## 2. Discover the runtime dictionary
 
 The canonical generator contains a fixed set of 413 stations. The program
-scans records until it has found 413 distinct names, comparing candidates by
+scans records until it has found 413 distinct names, comparing names by
 exact length and bytes.
 
 It computes the normal key for every discovered name:
@@ -61,6 +61,10 @@ struct DenseStat {
 The table has 65,536 entries, so it occupies 1 MiB per worker. Only the 413
 verified indices become active.
 
+Each slot starts with `count=0`, `min=INT16_MAX`, and `max=INT16_MIN`. The first
+measurement therefore uses the same unconditional min/max comparisons as
+every later measurement; the row loop has no empty-slot branch.
+
 For every row:
 
 ```text
@@ -75,17 +79,18 @@ row.
 
 ### Exact generic path
 
-If a custom input ends before 413 names are discovered, or two discovered
-names share a low-16 index, workers use the generic table.
+If a custom input ends before 413 names are discovered, two discovered names
+share a low-16 index, or `ONEBRC_GENERAL=1` is set, workers use the generic
+table.
 
 The generic table has 16,384 cache-line-sized entries. A row first checks the
 primary bucket selected by `key & 16383`. A key match is followed by exact
 name verification; collisions use linear probing. The first 32 name bytes are
 stored inline in the hot entry, with longer names retained in a side table.
 
-The generic path is also used by the small validation fixtures. Inputs with
-more than 413 distinct names are outside the optimized program's stated
-contract.
+The generic path is also used by the small validation fixtures. In general
+mode it supports up to 16,384 distinct valid names. A new name beyond that
+bound exits nonzero with `hash table full` or `merge table full`.
 
 ## 4. Distribute work
 
@@ -133,10 +138,11 @@ page-aligned fixtures to make accidental overreads deterministic.
 Dense merge visits only the 413 indices recorded during discovery. Generic
 merge scans populated worker slots and rechecks exact station identity.
 
-The resulting stations are sorted bytewise with `qsort_r`, formatted into one
-buffer, printed with `puts`, and flushed before `_exit(0)`. The immediate exit
-lets the kernel reclaim the large mapping without an explicit `munmap` walk on
-the measured path.
+The resulting stations are sorted bytewise with `qsort_r`. Output capacity is
+derived from the discovered station count and maximum supported row width,
+then the result is printed with `puts` and flushed before `_exit(0)`. The
+immediate exit lets the kernel reclaim the large mapping without an explicit
+`munmap` walk on the measured path.
 
 ## Correctness oracle
 
