@@ -3,9 +3,11 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 make -C baseline --no-print-directory
-actual=$(mktemp)
-invalid=$(mktemp)
-trap 'rm -f "$actual" "$invalid"' EXIT
+WORK=".test-work/baseline-smoke.$$"
+mkdir -p "$WORK"
+trap 'rm -rf "$WORK"' EXIT
+actual="$WORK/actual.out"
+invalid="$WORK/invalid.txt"
 
 baseline/baseline tests/custom/baseline-smoke.txt > "$actual"
 cmp -s "$actual" tests/custom/baseline-smoke.expected

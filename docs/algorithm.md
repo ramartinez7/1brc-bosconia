@@ -144,9 +144,33 @@ then the result is printed with `puts` and flushed before `_exit(0)`. The
 immediate exit lets the kernel reclaim the large mapping without an explicit
 `munmap` walk on the measured path.
 
+## Input and runtime envelope
+
+Before any mapping work, the program resolves its runtime configuration.
+`NTHREADS` is parsed as an unsigned decimal integer and rejected unless it
+lies between 1 and the online CPU limit; `ONEBRC_STRICT` and `ONEBRC_GENERAL`
+accept only their documented values. Thread creation and joining are both
+error-checked.
+
+`ONEBRC_STRICT=1` adds a single prevalidation pass over the mapping before
+dictionary discovery, allocation, or worker creation. It walks records
+linearly, bounds every field, counts distinct names against the mode's limit,
+and on the first violation writes one diagnostic to stderr and exits `2` with
+no output. The hot loops are unchanged: strict mode adds a pass, not a branch.
+
+Without strict mode the hot path stays specialized for well-formed input, and
+the cold paths bound their own scans, so a missing separator or an overlong
+name cannot walk past the mapping or overflow a copy buffer. Exit status and
+output for such input remain unspecified; see
+[`general-input.md`](general-input.md).
+
 ## Correctness oracle
 
 `baseline/main.c` is intentionally independent. It uses `getline`, a separate
 FNV-1a hash table, strict scalar temperature parsing, exact integer
-aggregation, and exact half-even mean rounding. `scripts/validate.sh` requires
-the optimized output to match it byte-for-byte.
+aggregation, and exact half-even mean rounding.
+
+[`../verify.sh`](../verify.sh) requires the optimized output to match the
+oracle on every dataset-independent fixture and on the whole deterministic
+corpus; `scripts/validate.sh` extends that to a complete dataset. See
+[`verification.md`](verification.md).

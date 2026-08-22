@@ -10,4 +10,9 @@ measurements*.txt
 .vscode/
 .idea/
 .worktrees/
+
+# test scratch and cached oracle output
 .test-work/
+.oracle-cache/
+__pycache__/
+*.pyc

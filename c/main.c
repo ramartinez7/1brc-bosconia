@@ -24,6 +24,10 @@
 #define DISPATCH_MASK (DISPATCH_SIZE - 1u)
 #define OUTPUT_BYTES_PER_STATION 120u
 
+static void strict_fail(
+    const char *reason, uint64_t record, size_t offset
+);
+
 #define LIKELY(x)   __builtin_expect(!!(x), 1)
 #define UNLIKELY(x) __builtin_expect(!!(x), 0)
 #define HOT_FN __attribute__((hot))
@@ -143,6 +147,7 @@ static int build_dense_dictionary(
         const uint8_t *semicolon = memchr(ptr, ';', bound);
         if (!semicolon) return 0;
         size_t length = (size_t)(semicolon - ptr);
+        if (length > 100u) return 0;
 
         size_t id = 0;
         for (; id < dictionary->count; id++) {
@@ -196,7 +201,9 @@ static ALWAYS_INLINE void parse_temp_dot(const uint8_t *ptr, int64_t *val, size_
 
 COLD_FN static size_t parse_line_long_semi(const uint8_t *line) {
     size_t off = 64;
-    while (line[off] != ';') off++;
+    while (off < MAX_LINE && line[off] != ';') off++;
+    if (off == MAX_LINE) die("record without separator");
+    if (off > 100u) die("name too long");
     return off;
 }
 
@@ -264,7 +271,9 @@ static ALWAYS_INLINE int name_eq_hot(const PerHot *e, const NameEntry *n, const 
 COLD_FN
 static void insert_new(PerHot *restrict hot, NameEntry *restrict names, uint32_t key, int64_t val, const uint8_t *name_ptr, size_t idx) {
     size_t len = 0;
-    while (name_ptr[len] != ';') len++;
+    while (len < MAX_LINE && name_ptr[len] != ';') len++;
+    if (len == MAX_LINE) die("record without separator");
+    if (len > 100u) die("name too long");
 
     PerHot *e = &hot[idx];
     e->key = key; e->count = 1; e->sum = val;
@@ -335,8 +344,8 @@ static void drain(const uint8_t *ptr, const uint8_t *safe_end, const uint8_t *en
         memcpy(line, ptr, available);
         size_t semi_off = 0;
         while (semi_off < available && line[semi_off] != ';') semi_off++;
+        if (semi_off > 101u || semi_off + 1 >= available) break;
         const uint8_t *val_ptr = line + semi_off + 1;
-        if (semi_off + 1 >= available) break;
 
         int64_t val; size_t adv;
         parse_temp_dot(val_ptr, &val, &adv);
@@ -473,8 +482,9 @@ static void dense_drain(
         {
             semicolon_offset++;
         }
+        if (semicolon_offset > 101u ||
+            semicolon_offset + 1u >= available) break;
         const uint8_t *value_ptr = line + semicolon_offset + 1u;
-        if (semicolon_offset + 1u >= available) break;
         int64_t value;
         size_t advance;
         parse_temp_dot(value_ptr, &value, &advance);
@@ -687,6 +697,154 @@ static char *allocate_output(size_t station_count) {
     return out;
 }
 
+typedef struct {
+    uint64_t hash;
+    uint32_t count;
+    uint8_t len;
+    uint8_t used;
+    uint8_t name[100];
+} StrictName;
+
+COLD_FN static void strict_fail(
+    const char *reason, uint64_t record, size_t offset
+) {
+    if (record) {
+        dprintf(STDERR_FILENO,
+                "onebrc: strict: %s at record %llu, byte %zu\n",
+                reason, (unsigned long long)record, offset);
+    } else {
+        dprintf(STDERR_FILENO, "onebrc: config: %s\n", reason);
+    }
+    _exit(2);
+}
+
+COLD_FN static void strict_prevalidate(
+    const uint8_t *data, size_t size, size_t max_names
+) {
+    if (!size) strict_fail("empty-input", 1, 0);
+    size_t capacity = max_names <= STATION_COUNT ? 1024u : 32768u;
+    StrictName *names = calloc(capacity, sizeof *names);
+    if (!names) die("calloc strict names");
+    size_t distinct = 0;
+    size_t offset = 0;
+    uint64_t record = 1;
+    while (offset < size) {
+        size_t available = size - offset;
+        size_t scan = available < MAX_LINE + 1u ? available : MAX_LINE + 1u;
+        const uint8_t *line = data + offset;
+        const uint8_t *newline = memchr(line, '\n', scan);
+        size_t line_len;
+        if (newline) {
+            line_len = (size_t)(newline - line);
+        } else {
+            if (available > MAX_LINE) {
+                free(names);
+                strict_fail("line-too-long", record, offset);
+            }
+            line_len = available;
+        }
+        if (!line_len) {
+            free(names);
+            strict_fail("empty-name", record, offset);
+        }
+        if (memchr(line, '\r', line_len)) {
+            free(names);
+            strict_fail("crlf", record, offset);
+        }
+        const uint8_t *semi = memchr(line, ';', line_len);
+        if (!semi) {
+            free(names);
+            strict_fail("missing-separator", record, offset);
+        }
+        size_t name_len = (size_t)(semi - line);
+        if (!name_len) {
+            free(names);
+            strict_fail("empty-name", record, offset);
+        }
+        if (name_len > 100u) {
+            free(names);
+            strict_fail("name-too-long", record, offset);
+        }
+        if (memchr(line, '\0', name_len)) {
+            free(names);
+            strict_fail("nul-name", record, offset);
+        }
+        const uint8_t *temp = semi + 1;
+        size_t temp_len = line_len - name_len - 1u;
+        size_t pos = 0;
+        if (pos < temp_len && temp[pos] == '-') pos++;
+        size_t digits = 0;
+        while (pos < temp_len && temp[pos] >= '0' && temp[pos] <= '9') {
+            digits++;
+            pos++;
+        }
+        if (digits < 1 || digits > 2 || pos >= temp_len || temp[pos++] != '.' ||
+            pos >= temp_len || temp[pos] < '0' || temp[pos] > '9' ||
+            ++pos != temp_len) {
+            free(names);
+            strict_fail("bad-temperature", record, offset + name_len + 1u);
+        }
+
+        uint64_t hash = 1469598103934665603ull;
+        for (size_t i = 0; i < name_len; i++) {
+            hash = (hash ^ line[i]) * 1099511628211ull;
+        }
+        size_t slot = (size_t)hash & (capacity - 1u);
+        for (;;) {
+            StrictName *entry = &names[slot];
+            if (!entry->used) {
+                if (distinct == max_names) {
+                    free(names);
+                    strict_fail("too-many-names", record, offset);
+                }
+                entry->used = 1;
+                entry->hash = hash;
+                entry->len = (uint8_t)name_len;
+                memcpy(entry->name, line, name_len);
+                entry->count = 1;
+                distinct++;
+                break;
+            }
+            if (entry->hash == hash && entry->len == name_len &&
+                memcmp(entry->name, line, name_len) == 0) {
+                if (entry->count == UINT32_MAX) {
+                    free(names);
+                    strict_fail("station-count-overflow", record, offset);
+                }
+                entry->count++;
+                break;
+            }
+            slot = (slot + 1u) & (capacity - 1u);
+        }
+        offset += line_len + (newline != NULL);
+        record++;
+    }
+    free(names);
+}
+
+static int resolve_nthreads(void) {
+    long online = sysconf(_SC_NPROCESSORS_ONLN);
+    int limit = online > 0 ? (int)online : 1;
+    if (limit > CPU_SETSIZE) limit = CPU_SETSIZE;
+    const char *value = getenv("NTHREADS");
+    if (!value) return limit;
+    if (!*value) strict_fail("NTHREADS must be a decimal integer", 0, 0);
+    unsigned parsed = 0;
+    for (const unsigned char *p = (const unsigned char *)value; *p; p++) {
+        if (*p < '0' || *p > '9') {
+            strict_fail("NTHREADS must be a decimal integer", 0, 0);
+        }
+        unsigned digit = (unsigned)(*p - '0');
+        if (parsed > (unsigned)limit / 10u ||
+            parsed * 10u + digit > (unsigned)limit) {
+            strict_fail("NTHREADS is outside the supported range", 0, 0);
+        }
+        parsed = parsed * 10u + digit;
+    }
+    if (!parsed) strict_fail("NTHREADS is outside the supported range", 0, 0);
+    return (int)parsed;
+}
+
 static char *calculate_dense(
     const uint8_t *data,
     off_t file_size,
@@ -702,10 +860,15 @@ static char *calculate_dense(
         args[i].file_size = file_size;
         args[i].cursor = &cursor;
         args[i].thread_idx = i;
-        if (pthread_create(&threads[i], NULL, dense_worker_main, &args[i]))
-            die("pthread_create dense");
+        int rc = pthread_create(
+            &threads[i], NULL, dense_worker_main, &args[i]
+        );
+        if (rc) { errno = rc; die("pthread_create dense"); }
     }
-    for (int i = 0; i < nthreads; i++) pthread_join(threads[i], NULL);
+    for (int i = 0; i < nthreads; i++) {
+        int rc = pthread_join(threads[i], NULL);
+        if (rc) { errno = rc; die("pthread_join dense"); }
+    }
 
     DenseStat *merged = calloc(STATION_COUNT, sizeof *merged);
     if (!merged) die("calloc dense merged");
@@ -752,23 +915,35 @@ static char *calculate_dense(
 }
 
 static char *calculate(const char *path) {
+    const char *strict_env = getenv("ONEBRC_STRICT");
+    int strict = strict_env && strcmp(strict_env, "0") != 0;
+    if (strict_env && strcmp(strict_env, "0") != 0 &&
+        strcmp(strict_env, "1") != 0) {
+        strict_fail("ONEBRC_STRICT must be 0 or 1", 0, 0);
+    }
+
     struct stat st;
     if (stat(path, &st) != 0) die("stat");
     off_t file_size = st.st_size;
 
-    const char *env = getenv("NTHREADS");
-    int nthreads = env ? atoi(env) : 0;
-    if (nthreads <= 0) { long n = sysconf(_SC_NPROCESSORS_ONLN); nthreads = n > 0 ? (int)n : 1; }
+    int nthreads = resolve_nthreads();
+    if (strict && file_size == 0) strict_fail("empty-input", 1, 0);
 
     int fd = open(path, O_RDONLY | O_NOATIME);
     if (fd < 0) die("open");
     uint8_t *data = mmap(NULL, (size_t)file_size, PROT_READ, MAP_PRIVATE, fd, 0);
     if (data == MAP_FAILED) die("mmap");
     close(fd);
-    (void)madvise(data, (size_t)file_size, MADV_WILLNEED);
 
     const char *general_env = getenv("ONEBRC_GENERAL");
     int general = general_env && strcmp(general_env, "1") == 0;
+    if (strict) {
+        strict_prevalidate(
+            data, (size_t)file_size, general ? TABLE_SIZE : STATION_COUNT
+        );
+    }
+    (void)madvise(data, (size_t)file_size, MADV_WILLNEED);
+
     if (!general) {
         DenseDictionary *dictionary = calloc(1, sizeof *dictionary);
         if (!dictionary) die("calloc dense dictionary");
@@ -784,9 +959,13 @@ static char *calculate(const char *path) {
     for (int i = 0; i < nthreads; i++) {
         args[i].data = data; args[i].file_size = file_size;
         args[i].cursor = &cursor; args[i].thread_idx = i;
-        if (pthread_create(&threads[i], NULL, worker_main, &args[i])) die("pthread_create");
+        int rc = pthread_create(&threads[i], NULL, worker_main, &args[i]);
+        if (rc) { errno = rc; die("pthread_create"); }
     }
-    for (int i = 0; i < nthreads; i++) pthread_join(threads[i], NULL);
+    for (int i = 0; i < nthreads; i++) {
+        int rc = pthread_join(threads[i], NULL);
+        if (rc) { errno = rc; die("pthread_join"); }
+    }
 
     HotEntry *merged_hot = calloc(TABLE_SIZE, sizeof(HotEntry));
     NameEntry *merged_names = calloc(TABLE_SIZE, sizeof(NameEntry));

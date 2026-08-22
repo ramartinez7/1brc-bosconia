@@ -12,6 +12,8 @@ BIN = IMPL / "c-linux"
 ORACLE = ROOT / "baseline" / "baseline"
 GOLDEN = 0x9E3779B97F4A7C15
 SCRATCH = ROOT / ".test-work" / "general-input"
+# NTHREADS is rejected above the online CPU limit, so stay within it.
+THREADS = str(min(4, len(os.sched_getaffinity(0))))
 
 def key(name: bytes) -> int:
     first = int.from_bytes(name[:8].ljust(8, b"\0"), "little")
@@ -60,7 +62,7 @@ def write_dataset(
 
 def run(binary: pathlib.Path, data: pathlib.Path, *, general: bool):
     environment = os.environ.copy()
-    environment["NTHREADS"] = "4"
+    environment["NTHREADS"] = THREADS
     if general:
         environment["ONEBRC_GENERAL"] = "1"
     return subprocess.run(

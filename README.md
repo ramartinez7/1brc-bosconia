@@ -10,36 +10,17 @@ station, and writes the sorted result.
 
 ## Performance
 
-The input files were produced by the official Java generator:
+The input files are produced by the official Java generator:
 1,000,000,000 rows, 413 station names, and about 13.8 GB of UTF-8 text.
 The implementation is validated byte-for-byte against the independent C
 oracle in [`baseline/main.c`](baseline/main.c).
 
-### Ryzen 7 1700
-
-Measured 2026-08-21 on an 8-core / 16-thread AMD Ryzen 7 1700 with 32 GiB
-DDR4-2667, Ubuntu 26.04, kernel 7.0.0-15, and gcc 15.2.0.
-
-| Mean elapsed | Std. dev. | Fastest | Mean CPU time |
-|---:|---:|---:|---:|
-| **635.7 ms** | 6.5 ms | 628.8 ms | 9,918 ms |
-
-The table summarizes 20 executions after five warmups.
-
-### Azure Standard_F16as_v6
-
-Measured 2026-08-21 on an AMD EPYC 9V74 VM with 16 physical Zen 4 cores,
-62 GiB RAM, Ubuntu 24.04, Azure kernel 6.17, and gcc 13.3.0.
-
-| Mean elapsed | Std. dev. | Fastest | Mean CPU time |
-|---:|---:|---:|---:|
-| **265.5 ms** | 0.4 ms | 264.9 ms | 4,118 ms |
-
-The table summarizes 20 executions after five warmups.
-
-Each table describes its own host and independently generated input file.
-Full methodology and hashes are in
-[`docs/bench-artifacts.md`](docs/bench-artifacts.md).
+A published measurement belongs to one exact source revision, one host, and
+one generated input file, and is republished when the tracked source changes.
+No measurement is published for the current source yet.
+[`docs/bench-artifacts.md`](docs/bench-artifacts.md) documents the metrics and
+the preflight that produce a publishable measurement, and
+[`scripts/bench.sh`](scripts/bench.sh) runs it.
 
 ## How it works
 
@@ -82,7 +63,9 @@ the binary.
 If a custom input ends before 413 names are found, or two names share a
 low-16 index, the program uses its exact generic hash-table path. Set
 `ONEBRC_GENERAL=1` to force that path for inputs with up to 16,384 distinct
-names. See [`docs/general-input.md`](docs/general-input.md).
+names, and `ONEBRC_STRICT=1` to validate the whole input before any work
+starts, rejecting out-of-contract records with exit `2`, empty output, and one
+diagnostic. See [`docs/general-input.md`](docs/general-input.md).
 
 The hot parser uses AVX2 to find `;`, branchless fixed-point temperature
 parsing, two independent parsing lanes, bucket prefetching, 2 MiB
@@ -111,15 +94,35 @@ The build creates two local executable files:
 These are generated build outputs and are intentionally excluded from Git, so
 they do not appear in the repository browser.
 
-## Validate
+## Verify
+
+```bash
+./verify.sh
+```
+
+One command runs every correctness surface that does not need the dataset:
+the oracle smoke test, byte-exact dense/fallback/temperature/EOF fixtures, the
+deterministic parser and guard-page sanitizer corpus, the general-input
+cardinality tests, the strict-input and runtime-envelope tests, and the
+repository contract checks.
+
+It needs no root privileges, no network access, and no generated dataset. It
+writes only inside `.test-work/`, removes that directory, and fails if the run
+changed the working tree. It is budgeted to finish in under five minutes on a
+modern desktop or CI runner. The same command runs in continuous integration
+for every pull request and every push to `main`.
+
+See [`docs/verification.md`](docs/verification.md).
+
+## Validate against the full dataset
 
 ```bash
 ./scripts/validate.sh measurements_1B.txt
 ```
 
-Validation compares the optimized output byte-for-byte with the oracle. It
-also runs dense-mode, collision-fallback, exhaustive-temperature, sanitizer,
-long-name, page-aligned EOF, and general-input/cardinality regressions.
+Validation runs `./verify.sh` first and then adds the one check that needs
+data: the optimized output compared byte-for-byte with the oracle over a
+complete dataset.
 
 ## Generate the official dataset
 
@@ -152,6 +155,7 @@ executable with Hyperfine.
 ## Repository layout
 
 ```text
+verify.sh             dataset-independent verification gate
 c/
   main.c              optimized implementation
   Makefile
@@ -159,11 +163,15 @@ baseline/
   main.c              independent correctness oracle
   Makefile
 scripts/              build, validate, benchmark, host setup, data generation
-tests/                dense, fallback, parser, sanitizer, and EOF regressions
+tests/                fixtures, parser/EOF corpus, sanitizer, strict-input,
+                      cardinality, and repository-contract tests
 docs/
-  algorithm.md        implementation walkthrough
-  bench-artifacts.md  benchmark methodology and measurements
-  general-input.md    exact supported input and cardinality modes
+  algorithm.md          implementation walkthrough
+  bench-artifacts.md    benchmark methodology and measurements
+  general-input.md      exact supported input, strict mode, cardinality modes
+  parser-fuzz-corpus.md deterministic corpus and input contract
+  verification.md       what ./verify.sh runs and what CI enforces
+.github/workflows/    continuous integration
 ```
 
 ## License
