@@ -747,7 +747,7 @@ COLD_FN static void strict_prevalidate(
             free(names);
             strict_fail("empty-name", record, offset);
         }
-        if (memchr(line, '\r', line_len)) {
+        if (line_len && line[line_len - 1u] == '\r') {
             free(names);
             strict_fail("crlf", record, offset);
         }
@@ -936,6 +936,10 @@ static char *calculate(const char *path) {
     close(fd);
 
     const char *general_env = getenv("ONEBRC_GENERAL");
+    if (general_env && strcmp(general_env, "0") != 0 &&
+        strcmp(general_env, "1") != 0) {
+        strict_fail("ONEBRC_GENERAL must be 0 or 1", 0, 0);
+    }
     int general = general_env && strcmp(general_env, "1") == 0;
     if (strict) {
         strict_prevalidate(

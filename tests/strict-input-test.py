@@ -71,6 +71,17 @@ with tempfile.TemporaryDirectory(
         assert result.returncode == 0, result.stderr
         assert result.stdout == expected
 
+    embedded_cr = temp / "embedded-cr.txt"
+    embedded_cr.write_bytes(b"A\rB;1.0\n")
+    embedded_expected = subprocess.run(
+        [str(BASELINE), str(embedded_cr)],
+        capture_output=True,
+        check=True,
+    ).stdout
+    embedded_result = run(embedded_cr)
+    assert embedded_result.returncode == 0, embedded_result.stderr
+    assert embedded_result.stdout == embedded_expected
+
     cases = {
         "empty-input": (b"", "empty-input"),
         "empty-name": (b";1.0\n", "empty-name"),
@@ -96,6 +107,15 @@ with tempfile.TemporaryDirectory(
     assert invalid_strict.returncode == 2
     assert invalid_strict.stdout == b""
     assert b"ONEBRC_STRICT" in invalid_strict.stderr
+
+    for hostile_general in ("", "yes", "2", "-1", " 1"):
+        invalid_general = run(valid, general=hostile_general)
+        assert invalid_general.returncode == 2
+        assert invalid_general.stdout == b""
+        assert b"ONEBRC_GENERAL" in invalid_general.stderr
+    disabled_general = run(valid, general="0")
+    assert disabled_general.returncode == 0
+    assert disabled_general.stdout == expected
 
     for hostile in (
         "",

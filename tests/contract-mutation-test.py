@@ -163,7 +163,7 @@ MUTATIONS = (
     ),
     (
         "a document references a path outside the repository",
-        substitute("docs/verification.md", "`scripts/build.sh`", "`c/current/build.sh`"),
+        substitute("docs/verification.md", "`scripts/build.sh`", "`c/missing-build.sh`"),
     ),
     (
         "a document leaks an absolute host path",

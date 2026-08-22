@@ -36,13 +36,14 @@ ONEBRC_STRICT=1 ONEBRC_GENERAL=1 c/c-linux measurements.txt
 
 Strict mode requires a non-empty file; names of 1-100 non-NUL bytes; one
 separator; temperatures matching `-?[0-9]{1,2}\.[0-9]`; records no longer than
-110 bytes; and an optional missing final newline. Default strict mode permits
-at most 413 distinct names. Strict general mode permits at most 16,384.
+110 bytes; no CRLF line ending; and an optional missing final newline.
+Carriage return remains valid inside a station name. Default strict mode
+permits at most 413 distinct names. Strict general mode permits at most 16,384.
 
 Input or configuration rejection exits `2`, writes one deterministic
 diagnostic to stderr, and writes no stdout. `ONEBRC_STRICT` accepts only `0`
-and `1`. `NTHREADS`, in every mode, accepts only an unsigned decimal integer
-between 1 and the online CPU limit.
+and `1`; `ONEBRC_GENERAL` accepts only `0` and `1`. `NTHREADS`, in every mode,
+accepts only an unsigned decimal integer between 1 and the online CPU limit.
 
 ## Cardinality modes
 

@@ -13,12 +13,21 @@ cd "$(dirname "$0")/.."
 
 WORK=$(realpath -m -- "${1:-.test-work/fixtures}")
 ROOT=$PWD
-if [[ "$WORK" == "/" || "$WORK" == "$ROOT" ]]; then
+case "$WORK" in
+    "$ROOT/.test-work"/*) ;;
+    *)
+        echo "fixtures: work directory must be under $ROOT/.test-work: $WORK" >&2
+        exit 1
+        ;;
+esac
+MARKER="$WORK/.fixture-oracle-owned"
+if [[ -e "$WORK" && ! -f "$MARKER" ]]; then
     echo "fixtures: refusing unsafe work directory: $WORK" >&2
     exit 1
 fi
 rm -rf -- "$WORK"
 mkdir -p "$WORK"
+touch "$MARKER"
 
 ./scripts/build.sh >/dev/null
 BIN="c/c-linux"
